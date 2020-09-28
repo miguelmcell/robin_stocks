@@ -142,7 +142,6 @@ def get_open_stock_positions(access_token, info=None):
     """
     url = urls.positions()
     payload = {'nonzero': 'true'}
-    print('acces token:', access_token, 'info', info)
     data = helper.request_get(url, 'pagination', payload, access_token=access_token)
 
     return(helper.filter(data, info))
@@ -648,12 +647,8 @@ def build_holdings(access_token, with_dividends=False):
     percentage of portfolio, and average buy price.
 
     """
-    print("build_holdings: accesstoken:", access_token, "withDividends:", with_dividends)
-    print("calling get open stock positions")
     positions_data = get_open_stock_positions(access_token)
-    print("calling load portfolio profile")
     portfolios_data = profiles.load_portfolio_profile(access_token)
-    print("calling laod account profile")
     accounts_data = profiles.load_account_profile(access_token)
 
     # user wants dividend information in their holdings

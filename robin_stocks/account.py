@@ -114,8 +114,7 @@ def get_all_positions(info=None):
     return(helper.filter(data, info))
 
 
-@helper.login_required
-def get_open_stock_positions(info=None):
+def get_open_stock_positions(access_token, info=None):
     """Returns a list of stocks that are currently held.
 
     :param info: Will filter the results to get a specific value.
@@ -143,7 +142,8 @@ def get_open_stock_positions(info=None):
     """
     url = urls.positions()
     payload = {'nonzero': 'true'}
-    data = helper.request_get(url, 'pagination', payload)
+    print('acces token:', access_token, 'info', info)
+    data = helper.request_get(url, 'pagination', payload, access_token=access_token)
 
     return(helper.filter(data, info))
 
@@ -638,8 +638,7 @@ def delete_symbols_from_watchlist(inputSymbols, name='Default'):
     return(data)
 
 
-@helper.login_required
-def build_holdings(with_dividends=False):
+def build_holdings(access_token, with_dividends=False):
     """Builds a dictionary of important information regarding the stocks and positions owned by the user.
 
     :param with_dividends: True if you want to include divident information.
@@ -649,9 +648,13 @@ def build_holdings(with_dividends=False):
     percentage of portfolio, and average buy price.
 
     """
-    positions_data = get_open_stock_positions()
-    portfolios_data = profiles.load_portfolio_profile()
-    accounts_data = profiles.load_account_profile()
+    print("build_holdings: accesstoken:", access_token, "withDividends:", with_dividends)
+    print("calling get open stock positions")
+    positions_data = get_open_stock_positions(access_token)
+    print("calling load portfolio profile")
+    portfolios_data = profiles.load_portfolio_profile(access_token)
+    print("calling laod account profile")
+    accounts_data = profiles.load_account_profile(access_token)
 
     # user wants dividend information in their holdings
     if with_dividends is True:

@@ -11,6 +11,7 @@ from functools import wraps
 
 import requests
 from robin_stocks.globals import LOGGED_IN, SESSION, OUTPUT
+import robin_stocks.helper as helper
 
 
 def set_login_state(logged_in):
@@ -22,7 +23,7 @@ def set_output(output):
     """Sets the global output stream"""
     global OUTPUT
     OUTPUT = output
-    
+
 def get_output():
     """Gets the current global output stream"""
     global OUTPUT
@@ -132,7 +133,7 @@ def id_for_option(symbol, expirationDate, strike, optionType):
     :type optionType: str
     :returns:  A string that represents the stocks option id.
 
-    """ 
+    """
     symbol = symbol.upper()
 
     payload = {
@@ -244,7 +245,7 @@ def request_document(url, payload=None):
     :type url: str
     :returns: Returns the session.get() data as opppose to session.get().json() data.
 
-    """ 
+    """
     try:
         res = SESSION.get(url, params=payload)
         res.raise_for_status()
@@ -255,7 +256,7 @@ def request_document(url, payload=None):
     return(res)
 
 
-def request_get(url, dataType='regular', payload=None, jsonify_data=True):
+def request_get(url, dataType='regular', payload=None, jsonify_data=True, access_token=''):
     """For a given url and payload, makes a get request and returns the data.
 
     :param url: The url to send a get request to.
@@ -279,14 +280,34 @@ def request_get(url, dataType='regular', payload=None, jsonify_data=True):
     res = None
     if jsonify_data:
         try:
+            ###
+            helper.set_login_state(True)
+            helper.update_session(
+                'Authorization', '{0} {1}'.format('Bearer', access_token))
+            ###
             res = SESSION.get(url, params=payload)
             res.raise_for_status()
+            ###
+            helper.set_login_state(False)
+            helper.update_session('Authorization', None)
+            ###
             data = res.json()
         except (requests.exceptions.HTTPError, AttributeError) as message:
             print(message, file=get_output())
+            helper.set_login_state(False)
+            helper.update_session('Authorization', None)
             return(data)
     else:
+        ###
+        helper.set_login_state(True)
+        helper.update_session(
+            'Authorization', '{0} {1}'.format('Bearer', access_token))
+        ###
         res = SESSION.get(url, params=payload)
+        ###
+        helper.set_login_state(False)
+        helper.update_session('Authorization', None)
+        ###
         return(res)
     # Only continue to filter data if jsonify_data=True, and Session.get returned status code <200>.
     if (dataType == 'results'):
@@ -308,11 +329,24 @@ def request_get(url, dataType='regular', payload=None, jsonify_data=True):
             print('Found Additional pages.', file=get_output())
         while nextData['next']:
             try:
+                ###
+                helper.set_login_state(True)
+                helper.update_session(
+                    'Authorization', '{0} {1}'.format('Bearer', access_token))
+                ###
                 res = SESSION.get(nextData['next'])
                 res.raise_for_status()
+                ###
+                helper.set_login_state(False)
+                helper.update_session('Authorization', None)
+                ###
                 nextData = res.json()
             except:
                 print('Additional pages exist but could not be loaded.', file=get_output())
+                ###
+                helper.set_login_state(False)
+                helper.update_session('Authorization', None)
+                ###
                 return(data)
             print('Loading page '+str(counter)+' ...', file=get_output())
             counter += 1
@@ -323,8 +357,12 @@ def request_get(url, dataType='regular', payload=None, jsonify_data=True):
             data = data['results'][0]
         except KeyError as message:
             print("{0} is not a key in the dictionary".format(message), file=get_output())
+            helper.set_login_state(False)
+            helper.update_session('Authorization', None)
             return(None)
         except IndexError as message:
+            helper.set_login_state(False)
+            helper.update_session('Authorization', None)
             return(None)
 
     return(data)

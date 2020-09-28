@@ -3,8 +3,7 @@ import robin_stocks.helper as helper
 import robin_stocks.urls as urls
 
 
-@helper.login_required
-def load_account_profile(info=None):
+def load_account_profile(access_token, info=None):
     """Gets the information associated with the accounts profile,including day
     trading information and cash being held by Robinhood.
 
@@ -61,7 +60,7 @@ def load_account_profile(info=None):
 
     """
     url = urls.account_profile()
-    data = helper.request_get(url, 'indexzero')
+    data = helper.request_get(url, 'indexzero', access_token=access_token)
     return(helper.filter(data, info))
 
 
@@ -131,8 +130,7 @@ def load_investment_profile(info=None):
     return(helper.filter(data, info))
 
 
-@helper.login_required
-def load_portfolio_profile(info=None):
+def load_portfolio_profile(access_token, info=None):
     """Gets the information associated with the portfolios profile,
     such as withdrawable amount, market value of account, and excess margin.
 
@@ -166,7 +164,7 @@ def load_portfolio_profile(info=None):
 
     """
     url = urls.portfolio_profile()
-    data = helper.request_get(url, 'indexzero')
+    data = helper.request_get(url, 'indexzero', access_token=access_token)
     return(helper.filter(data, info))
 
 

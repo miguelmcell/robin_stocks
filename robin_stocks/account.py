@@ -674,11 +674,11 @@ def build_holdings(access_token, with_dividends=False):
             continue
 
         try:
-            instrument_data = stocks.get_instrument_by_url(item['instrument'])
+            instrument_data = stocks.get_instrument_by_url(item['instrument'], access_token, info=None)
             symbol = instrument_data['symbol']
-            fundamental_data = stocks.get_fundamentals(symbol)[0]
+            fundamental_data = stocks.get_fundamentals(symbol, access_token, info=None)[0]
 
-            price = stocks.get_latest_price(instrument_data['symbol'])[0]
+            price = stocks.get_latest_price(instrument_data['symbol'], access_token=access_token)[0]
             quantity = item['quantity']
             equity = float(item['quantity']) * float(price)
             equity_change = (float(quantity) * float(price)) - \

@@ -2,7 +2,7 @@
 import robin_stocks.helper as helper
 import robin_stocks.urls as urls
 
-def get_quotes(inputSymbols, info=None):
+def get_quotes(inputSymbols, info=None,access_token=None):
     """Takes any number of stock tickers and returns information pertaining to its price.
 
     :param inputSymbols: May be a single stock ticker or a list of stock tickers.
@@ -31,7 +31,7 @@ def get_quotes(inputSymbols, info=None):
     symbols = helper.inputs_to_set(inputSymbols)
     url = urls.quotes()
     payload = {'symbols': ','.join(symbols)}
-    data = helper.request_get(url, 'results', payload)
+    data = helper.request_get(url, 'results', payload,access_token=access_token)
 
     if (data == None or data == [None]):
         return data
@@ -45,7 +45,7 @@ def get_quotes(inputSymbols, info=None):
     return(helper.filter(data, info))
 
 
-def get_fundamentals(inputSymbols, info=None):
+def get_fundamentals(inputSymbols, access_token, info=None):
     """Takes any number of stock tickers and returns fundamental information
     about the stock such as what sector it is in, a description of the company, dividend yield, and market cap.
 
@@ -151,7 +151,7 @@ def get_instruments_by_symbols(inputSymbols, info=None):
     return(helper.filter(data, info))
 
 
-def get_instrument_by_url(url, info=None):
+def get_instrument_by_url(url, access_token, info=None):
     """Takes a single url for the stock. Should be located at ``https://api.robinhood.com/instruments/<id>`` where <id> is the
     id of the stock.
 
@@ -188,12 +188,12 @@ def get_instrument_by_url(url, info=None):
                       * default_collar_fraction
 
     """
-    data = helper.request_get(url, 'regular')
+    data = helper.request_get(url, 'regular', access_token=access_token)
 
     return(helper.filter(data, info))
 
 
-def get_latest_price(inputSymbols, priceType=None, includeExtendedHours=True):
+def get_latest_price(inputSymbols, priceType=None, includeExtendedHours=True,access_token=None):
     """Takes any number of stock tickers and returns the latest price of each one as a string.
 
     :param inputSymbols: May be a single stock ticker or a list of stock tickers.

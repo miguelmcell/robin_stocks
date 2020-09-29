@@ -676,7 +676,7 @@ def build_holdings(access_token, with_dividends=False):
         try:
             instrument_data = stocks.get_instrument_by_url(item['instrument'], access_token, info=None)
             symbol = instrument_data['symbol']
-            fundamental_data = stocks.get_fundamentals(symbol, access_token, info=None)[0]
+            # fundamental_data = stocks.get_fundamentals(symbol, access_token, info=None)[0]
 
             price = stocks.get_latest_price(instrument_data['symbol'], access_token=access_token)[0]
             quantity = item['quantity']
@@ -700,13 +700,15 @@ def build_holdings(access_token, with_dividends=False):
                 {'percent_change': "{0:.2f}".format(percent_change)})
             holdings[symbol].update(
                 {'equity_change': "{0:2f}".format(equity_change)})
+            holdings[symbol].update(
+                {'percentage': "{0:2f}".format(percentage)})
             holdings[symbol].update({'type': instrument_data['type']})
             holdings[symbol].update(
                 {'name': stocks.get_name_by_symbol(symbol)})
             holdings[symbol].update({'id': instrument_data['id']})
-            holdings[symbol].update({'pe_ratio': fundamental_data['pe_ratio']})
-            holdings[symbol].update(
-                {'percentage': "{0:.2f}".format(percentage)})
+            # holdings[symbol].update(
+            #     {'percentage': "{0:2f}".format(percentage)})
+            # holdings[symbol].update({'pe_ratio': fundamental_data['pe_ratio']})
 
             if with_dividends is True:
                 # dividend_data was retrieved earlier

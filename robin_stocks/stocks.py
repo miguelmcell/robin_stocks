@@ -31,8 +31,7 @@ def get_quotes(inputSymbols, info=None,access_token=None):
     symbols = helper.inputs_to_set(inputSymbols)
     url = urls.quotes()
     payload = {'symbols': ','.join(symbols)}
-    data = helper.request_get(url, 'results', payload,access_token=access_token)
-
+    data = helper.request_get(url, 'results', payload, access_token=access_token)
     if (data == None or data == [None]):
         return data
 
@@ -193,7 +192,7 @@ def get_instrument_by_url(url, access_token, info=None):
     return(helper.filter(data, info))
 
 
-def get_latest_price(inputSymbols, priceType=None, includeExtendedHours=True,access_token=None):
+def get_latest_price(inputSymbols, priceType=None, includeExtendedHours=True, access_token=None):
     """Takes any number of stock tickers and returns the latest price of each one as a string.
 
     :param inputSymbols: May be a single stock ticker or a list of stock tickers.
@@ -207,8 +206,7 @@ def get_latest_price(inputSymbols, priceType=None, includeExtendedHours=True,acc
 
     """ 
     symbols = helper.inputs_to_set(inputSymbols)
-    quote = get_quotes(symbols)
-
+    quote = get_quotes(symbols, access_token=access_token)
     prices = []
     for item in quote:
         if item:
@@ -229,7 +227,7 @@ def get_latest_price(inputSymbols, priceType=None, includeExtendedHours=True,acc
 
 
 @helper.convert_none_to_string
-def get_name_by_symbol(symbol):
+def get_name_by_symbol(symbol, access_token):
     """Returns the name of a stock from the stock ticker.
 
     :param symbol: The ticker of the stock as a string.
@@ -245,7 +243,7 @@ def get_name_by_symbol(symbol):
 
     url = urls.instruments()
     payload = {'symbol': symbol}
-    data = helper.request_get(url, 'indexzero', payload)
+    data = helper.request_get(url, 'indexzero', payload, access_token=access_token)
     if not data:
         return(None)
     # If stock doesn't have a simple name attribute then get the full name.
